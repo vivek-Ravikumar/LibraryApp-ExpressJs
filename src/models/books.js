@@ -15,7 +15,7 @@ const BookSchema = new Schema({
     type: String
   },
   borrowers: {
-    type: Array
+    type: Number
   }
 });
 

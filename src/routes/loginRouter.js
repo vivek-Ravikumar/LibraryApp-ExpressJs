@@ -2,6 +2,10 @@ const express = require("express");
 const User = require("../models/users");
 const loginRouter = express.Router();
 const { generateHashSynch, compareHash } = require("../utils/hash");
+const {
+  userTokenGenerator,
+  userTokenValidator
+} = require("../utils/jwtTokenManager");
 
 loginRouter
   .get("/", (req, res) => {
@@ -13,7 +17,9 @@ loginRouter
     if (user) {
       const result = await compareHash(password, user.passwordHash);
       if (result) {
-        res.send({status:"success"});
+        const token = userTokenGenerator(email);
+        res.cookie("jwt", token);
+        res.send({ status: "success", jwt: token, userData: user });
       } else {
         res.send({ status: "incorrect password" });
       }
@@ -21,15 +27,22 @@ loginRouter
       res.send({ status: "invalid user" });
     }
   })
-  .post("/signup", (req, res) => {
-    const userDetails = req.body;
+  .post("/signup", async (req, res) => {
+    const { name, email, password } = req.body;
     try {
-      const newUser = new User({
-        email: userDetails.email,
-        passwordHash: generateHashSynch(userDetails.password)
-      });
-      newUser.save().then(console.log);
-      res.send({ status: "success" });
+      const dupUser = await User.findOne({ email });
+      if (dupUser) {
+        res.send({ status: "Email already taken" });
+      } else {
+        const newUser = new User({
+          name,
+          email,
+          passwordHash: generateHashSynch(password),
+          borrowedBooks: []
+        });
+        newUser.save().then(console.log);
+        res.send({ status: "success" });
+      }
     } catch (e) {
       console.error(e);
       res.send({ status: "something went wrong" });

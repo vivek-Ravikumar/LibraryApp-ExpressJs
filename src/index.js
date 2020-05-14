@@ -1,6 +1,7 @@
 const express = require("express");
 const booksRouter = require("./routes/booksRouter");
 const loginRouter = require("./routes/loginRouter");
+const userRouter = require("./routes/userRouter");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
@@ -10,6 +11,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use("/books", booksRouter);
 app.use("/login", loginRouter);
+app.use("/user", userRouter);
 
 app.get("/", (req, res) => {
   res.send("from the server");

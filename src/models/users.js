@@ -4,29 +4,33 @@ const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
 const UserSchema = new Schema({
-  email: {
+  name: {
     type: String,
     required: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true
   },
   passwordHash: {
     type: String,
     required: true
-  }
+  },
+  borrowedBooks: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Books"
+    }
+  ],
+  cart: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Books"
+    }
+  ]
 });
 
 const User = model("Users", UserSchema);
 
-// const newUser = new User({
-//   email: "myuser@test.com"
-// });
-
-// newUser.save().then(console.log);
-
-// const clearUsers = () => {
-//   User.remove({})
-//     .then(console.log)
-//     .catch(console.error);
-// };
-
-// clearUsers();
 module.exports = User;
