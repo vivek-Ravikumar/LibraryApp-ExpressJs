@@ -2,15 +2,23 @@ const express = require("express");
 const books = require("../models/books");
 const User = require("../models/users");
 const bookRouter = express.Router();
+const { userTokenValidator } = require("../utils/jwtTokenManager");
 
 bookRouter.get("/", async (req, res) => {
-  //res.send("from books router");
+  const jwtToken = req.headers.authorization;
+  console.log(jwtToken);
 
-  const bookdata = await books.find({});
-  res.status(200).send({ books: bookdata });
+  if (userTokenValidator(jwtToken)) {
+    const bookdata = await books.find({});
+    res.status(200).send({status:'success', books: bookdata });
+  } else {
+    res.status(400).send({ status: "unauthorized" });
+  }
 });
 
 bookRouter.get("/borrow/:userId/:bookId/", async (req, res) => {
+  const jwtToken = req.headers("Authorization");
+  console.log(jwtToken);
   const { userId, bookId } = req.params;
   let updatedBorrowers;
   try {
