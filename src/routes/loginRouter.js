@@ -32,7 +32,7 @@ loginRouter
     try {
       const dupUser = await User.findOne({ email });
       if (dupUser) {
-        res.send({ status: "Email already taken" });
+        res.send({ status: "Email already Registered" });
       } else {
         const newUser = new User({
           name,

@@ -6,19 +6,19 @@ const { userTokenValidator } = require("../utils/jwtTokenManager");
 
 bookRouter.get("/", async (req, res) => {
   const jwtToken = req.headers.authorization;
-  console.log(jwtToken);
+  //console.log(jwtToken);
 
   if (userTokenValidator(jwtToken)) {
     const bookdata = await books.find({});
-    res.status(200).send({status:'success', books: bookdata });
+    res.status(200).send({ status: "success", books: bookdata });
   } else {
     res.status(400).send({ status: "unauthorized" });
   }
 });
 
 bookRouter.get("/borrow/:userId/:bookId/", async (req, res) => {
-  const jwtToken = req.headers("Authorization");
-  console.log(jwtToken);
+  const jwtToken = req.headers.authorization;
+
   const { userId, bookId } = req.params;
   let updatedBorrowers;
   try {
@@ -30,11 +30,11 @@ bookRouter.get("/borrow/:userId/:bookId/", async (req, res) => {
         { borrowers: updatedBorrowers }
       );
       if (result.n) {
-        console.log(userId);
+        // console.log(userId);
 
         const sample = await User.findById(userId);
         const updatedBorrowedBooks = [...sample.borrowedBooks, bookId];
-        console.log(updatedBorrowedBooks);
+        //console.log(updatedBorrowedBooks);
 
         const userResult = await User.updateOne(
           { _id: userId },
@@ -43,13 +43,13 @@ bookRouter.get("/borrow/:userId/:bookId/", async (req, res) => {
         if (userResult.n) {
           const { cart } = await User.findById(userId);
           const newCart = cart.filter(c => c.toString() !== bookId);
-          console.log(newCart);
+          // console.log(newCart);
           const cartResult = await User.updateOne(
             { _id: userId },
             { cart: newCart }
           );
           if (cartResult.n) {
-            console.log("updated user profile");
+            // console.log("updated user profile");
             res.send({ status: "success" });
           } else {
             res.send({ status: "something went wrong" });
@@ -90,11 +90,11 @@ bookRouter.get("/return/:userId/:bookId/", async (req, res) => {
       //console.log(userId);
 
       const { borrowedBooks } = await User.findById(userId);
-      console.log("actual", borrowedBooks);
+      //console.log("actual", borrowedBooks);
       const updatedBorrowedBooks = borrowedBooks.filter(
         book => book.toString() !== bookId
       );
-      console.log("updated", updatedBorrowedBooks);
+      //console.log("updated", updatedBorrowedBooks);
 
       const userResult = await User.updateOne(
         { _id: userId },
